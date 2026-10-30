@@ -1,0 +1,131 @@
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#03070d;color:#e4f9ff;font-family:system-ui,Arial,sans-serif;touch-action:none}#pano,#surface,#fxCanvas{position:absolute;inset:0;width:100%;height:100%}#surface{cursor:grab;touch-action:none;z-index:10}#surface.grab{cursor:grabbing}#fxCanvas{z-index:6;pointer-events:none}.toolbar{position:fixed;top:14px;left:12px;display:flex;gap:7px;z-index:20;flex-wrap:wrap}.toolbar button{background:rgba(4,26,38,.86);color:#dbfdff;border:1px solid #25b6d3;border-radius:11px;padding:10px 12px;cursor:pointer;font-weight:800;font-size:12px;box-shadow:0 0 12px #02bacb30;min-height:40px}.toolbar button:focus-visible,.toolbar button:hover{outline:2px solid #83ecff}.toolbar button[hidden]{display:none!important}.logo{position:fixed;top:68px;left:13px;z-index:17;border-radius:13px;background:rgba(5,20,30,.73);border:1px solid #27606d;padding:8px 12px;font-size:11px;font-weight:800;letter-spacing:.02em;pointer-events:none}#loading{position:fixed;z-index:100;inset:0;display:grid;place-items:center;pointer-events:none;background:#02080dd9;transition:opacity .4s,visibility .4s}#loading.done{opacity:0;visibility:hidden}.loader{min-width:min(325px,90vw);background:#071622;border:1px solid #196d80;padding:22px;border-radius:13px;text-align:center;box-shadow:0 14px 50px #0009}.loader strong,.loader span{display:block}.loader strong{font-size:18px;color:#c7feff}.loader span{margin:6px 0 4px;color:#87d5e4;font-size:12px}.loader b{font-size:43px;font-variant-numeric:tabular-nums;display:block;margin:10px}.bar{height:6px;overflow:hidden;background:#16405a;border-radius:20px}.bar div{width:0;height:100%;background:linear-gradient(90deg,#14b3ea,#74fff8);transition:width .18s}.loader small{display:block;margin-top:10px;color:#a5becb}#message{position:fixed;z-index:101;bottom:80px;left:50%;transform:translateX(-50%);background:#161c2a;border:1px solid #bc7f3a;border-radius:10px;padding:12px 18px;max-width:95vw;font-size:13px;text-align:center}#message[hidden]{display:none}.hint{position:fixed;z-index:14;left:50%;bottom:14px;transform:translateX(-50%);background:#061723bd;border:1px solid #14444e;border-radius:20px;color:#8cbcc9;font-size:11px;padding:7px 14px;white-space:nowrap;pointer-events:none}#videoBox{position:fixed;z-index:40;right:15px;bottom:55px;width:min(480px,calc(100vw - 30px));padding:10px;background:#030910eb;border:1px solid #39c9db;border-radius:12px}#videoBox[hidden]{display:none}#videoBox video{width:100%;max-height:60vh}#closeVideo{float:right;background:#123;color:white;border:1px solid #456;border-radius:6px;padding:5px 9px;cursor:pointer}@media(max-width:600px){.toolbar{top:10px;left:8px}.toolbar button{padding:9px;font-size:11px}.logo{top:62px;left:8px}.hint{font-size:9px;bottom:10px;padding:6px;max-width:95vw}}
+/* Read-only playback; no STUDIO authoring panels are exposed. */
+#experienceCanvas{position:fixed;inset:0;z-index:8;width:100%;height:100%;pointer-events:none}
+.toolbar{display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100vw - 20px)}
+.toolbar button{min-width:44px;white-space:nowrap}
+.toolbar button.active{border-color:#67fffb;box-shadow:0 0 12px rgba(46,232,235,.45)}
+@media(max-width:620px){.toolbar{top:10px;left:10px;right:10px;gap:4px}.toolbar button{font-size:11px;padding:8px 9px}.logo{top:100px;font-size:11px}}
+
+/* v72 visitor presentation — brand is the sole LABEL trigger, not a separate toolbar button. */
+#brand{cursor:pointer;pointer-events:auto;text-align:left;color:#eaffff;font-family:Arial,Helvetica,sans-serif;background:rgba(5,8,14,.78);backdrop-filter:blur(8px);letter-spacing:.35px;box-shadow:0 0 18px rgba(45,220,255,.13),inset 0 0 12px rgba(60,210,255,.055);padding:7px 14px;border:1px solid rgba(78,235,255,.32);border-radius:10px;max-width:min(380px,calc(100vw - 30px));text-shadow:0 0 5px rgba(100,245,255,.35),0 0 14px rgba(65,190,255,.22)}
+#brand .brandSub,#brand .brandContact{display:none;font-size:11px;margin-top:8px;font-weight:600;letter-spacing:.2px}#brand .brandContact{color:#87fff0}
+#brand.expanded{max-width:min(380px,calc(100vw - 30px));border:2px solid #a5ff5a;box-shadow:0 0 8px #bdff00,0 0 24px rgba(161,255,0,.74),0 0 56px rgba(8,255,224,.52),inset 0 0 24px rgba(90,255,135,.19);animation:xyzBrandGlow 2.5s ease-in-out infinite alternate}
+#brand.expanded .brandSub,#brand.expanded .brandContact{display:block}
+@keyframes xyzBrandGlow{from{filter:brightness(1)}to{filter:brightness(1.3)}}
+@media(max-width:900px){#brand.expanded{width:min(280px,calc(100vw - 28px));box-sizing:border-box;padding:15px 19px;border:2px solid #72ffee;box-shadow:0 0 18px #73fca7,0 0 45px rgba(22,255,215,.67),inset 0 0 20px rgba(44,255,169,.18)}#brand.expanded .brandSub,#brand.expanded .brandContact{display:none}}
+
+/* v4 VIEW-ONLY: faithful v72 compact navigation, no authoring controls */
+#toolbar.toolbar{position:fixed;left:16px;top:16px;z-index:50;display:flex;gap:5px;padding:5px;border-radius:12px;background:rgba(5,8,14,.72);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);max-width:calc(100vw - 76px);box-sizing:border-box;flex-wrap:nowrap}
+#toolbar .tool{min-width:36px;width:auto;height:36px;min-height:36px;line-height:1;padding:0 9px;border-radius:9px;border:1px solid rgba(65,211,231,.38);cursor:pointer;background:rgba(255,255,255,.09);color:#eaffff;font:800 14px Arial,sans-serif;box-shadow:inset 0 0 0 1px rgba(7,208,249,.10),0 0 7px rgba(26,215,240,.13);white-space:nowrap;flex:none}
+#toolbar .tool.play{min-width:62px;font-size:12px}#toolbar #tour,#toolbar #video{font-size:10px;min-width:47px}#toolbar #fxToggle{font-size:11px;min-width:48px}#toolbar #mp3{font-size:10px}
+#toolbar .tool.active,#toolbar #fxToggle:not(.off){border-color:#57fff2;box-shadow:0 0 8px rgba(67,246,234,.58),0 0 21px rgba(43,204,245,.35),inset 0 0 11px rgba(30,230,235,.13)}
+#toolbar #fxToggle.off{background:#f2b9b9;color:#1a0a0a;border-color:#bc6969}
+#brand{left:16px;top:68px;padding:7px 14px;font:700 13px Arial,sans-serif;max-width:min(380px,calc(100vw - 32px))}
+#brand.expanded .brandSub,#brand.expanded .brandContact{display:block}#brand .brandSub,#brand .brandContact{font-size:11px;line-height:1.3;font-weight:400}
+#helpToggle{position:fixed;bottom:16px;left:16px;z-index:40;width:32px;height:32px;border-radius:50%;border:1px solid #ffffff30;background:#05080ac7;color:#fff;font-weight:700;cursor:pointer}
+#help{position:fixed;left:16px;bottom:58px;z-index:39;max-width:min(440px,calc(100vw - 24px));color:#e9eef7;background:rgba(5,8,14,.83);backdrop-filter:blur(8px);padding:8px 11px;border-radius:10px;font:11px/1.45 Arial,sans-serif;pointer-events:none}
+#help.hidden{display:none}
+.fx-bottom{position:fixed;left:60px;bottom:16px;z-index:40;display:flex;gap:8px;align-items:center}
+.fx-bottom button{height:32px;padding:0 10px;border:1px solid #26caed;border-radius:9px;background:rgba(5,20,32,.92);color:#b8f8ff;font:800 11px Arial,sans-serif;box-shadow:0 0 14px rgba(0,230,255,.22);cursor:pointer}
+.fx-bottom button[hidden],#fxChoices[hidden]{display:none!important}
+.fx-bottom #burst{border-color:#84ffd5;color:#afffe3}
+#fxChoices{position:fixed;bottom:58px;left:70px;z-index:42;max-width:min(318px,calc(100vw - 30px));background:rgba(5,11,25,.96);border:1px solid #37d6ff;border-radius:14px;padding:11px;font:12px Arial,sans-serif;box-shadow:0 0 24px #18bdff55}
+#fxChoices strong{color:#65ffed}#fxChoices .choices{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:9px}
+#fxChoices button{background:#142e47;border:1px solid #3c97c5;border-radius:7px;color:#e8fbff;padding:8px;cursor:pointer;font-size:11px}
+#closeFxChoices{float:right;min-width:27px}
+#axesCanvas{position:fixed;right:22px;bottom:70px;z-index:14;width:132px;height:132px;pointer-events:none}
+#hint{bottom:14px;left:50%;z-index:12}
+@media(max-width:600px){#toolbar.toolbar{left:7px;top:7px;gap:3px;padding:3px;max-width:calc(100vw - 12px);overflow-x:auto;scrollbar-width:none}#toolbar .tool{min-width:30px;height:32px;min-height:32px;padding:0 6px;font-size:12px;border-radius:8px}#toolbar .tool.play{min-width:55px;font-size:11px}#toolbar #fxToggle{min-width:43px;font-size:10px}#toolbar #tour,#toolbar #video{font-size:9px;min-width:40px}#toolbar #mp3{font-size:9px}#brand{top:49px;left:7px;padding:5px 8px;font-size:13px}#brand.expanded{width:min(280px,calc(100vw - 28px));box-sizing:border-box;padding:15px 19px;border:2px solid #72ffee;box-shadow:0 0 18px #73fca7,0 0 45px rgba(22,255,215,.67),inset 0 0 20px rgba(44,255,169,.18)}#brand.expanded .brandSub,#brand.expanded .brandContact{display:none!important}#helpToggle{left:12px;bottom:16px}#help{left:7px;bottom:59px}#fxBottom{left:51px;bottom:16px;gap:5px;max-width:calc(100vw - 60px);overflow-x:auto}#fxBottom button{height:32px;padding:0 7px;font-size:10px;white-space:nowrap}#axesCanvas{width:92px;height:92px;right:7px;bottom:65px}#hint{bottom:7px;font-size:9px}#fxChoices{left:8px;bottom:53px}}
+
+/* v5: no RESET or spectator MORPH buttons. Brand is sole LABEL. */
+#reset,#gpuGuest,#morphGuest{display:none!important}
+
+/* v10 — mobile-only refinement. Desktop STUDIO-like controls remain unchanged. */
+.hintMobile{display:none}
+@media (max-width:600px){
+  /* Old .toolbar {right:10px} stretched the ghost background to the screen edge. */
+  #toolbar.toolbar{
+    right:auto;width:max-content;max-width:calc(100vw - 14px);
+    overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
+    border-radius:12px;
+  }
+  #toolbar.toolbar::-webkit-scrollbar{display:none}
+  /* Tighten both states of the author LABEL frame without changing its trigger. */
+  #brand{width:max-content;max-width:calc(100vw - 22px);min-width:0}
+  #brand.expanded{
+    width:min(236px,calc(100vw - 28px));max-width:min(236px,calc(100vw - 28px));
+    min-height:63px;padding:11px 13px;
+  }
+  /* Spectator's bottom FX command is now invoked from the brand on phones. */
+  #fxBottom #burst{display:none!important}
+  /* Reserve a separate two-line instruction block to the right of the info button. */
+  #helpToggle{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+  #hint{
+    left:54px;right:7px;bottom:calc(14px + env(safe-area-inset-bottom,0px));
+    transform:none;max-width:none;width:auto;white-space:normal;
+    padding:6px 7px;border-radius:11px;
+    font:10px/1.17 Arial,sans-serif;color:#a0d4df;text-align:left;
+  }
+  #hint .hintDesktop{display:none}
+  #hint .hintMobile{display:flex;flex-direction:column;gap:1px}
+  #hint .hintMobileTop,#hint .hintMobileBottom{display:flex;align-items:center;white-space:nowrap}
+  #hint .hintMobileTop{gap:3px}
+  #hint .hintMobileBottom{gap:4px}
+  #hint .wiredMousePc{flex:0 0 45px;width:45px;height:20px;color:#84e7f7}
+  #fxBottom{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+}
+@media (max-width:360px){
+  #hint{left:52px;font-size:9px;padding:6px 5px}
+  #hint .wiredMousePc{width:40px;flex-basis:40px}
+  #brand.expanded{width:min(225px,calc(100vw - 26px))}
+}
+
+/* v11: mobile visual refinement, no WebGL/FX/camera edits. */
+@media(max-width:600px){
+  /* Closed and expanded LABEL are compact — size to the text, not a tall 236px box. */
+  #brand,#brand.expanded{
+    box-sizing:border-box;
+    width:max-content!important;
+    max-width:min(205px,calc(100vw - 22px))!important;
+    min-width:0!important;
+    min-height:0!important;
+    height:auto;
+    padding:7px 10px!important;
+    line-height:1.2;
+    white-space:nowrap;
+    border-radius:10px;
+  }
+  #brand.expanded{padding:8px 10px!important}
+  /* One line that never overlaps the circular info button. */
+  #hint{
+    left:54px;right:6px;
+    bottom:calc(14px + env(safe-area-inset-bottom,0px));
+    width:auto;max-width:none;
+    padding:6px 6px;
+    border-radius:12px;
+    font:10px/1 Arial,sans-serif;
+    white-space:nowrap;
+    overflow:hidden;
+  }
+  #hint .hintDesktop{display:none}
+  #hint .hintMobile{
+    display:flex;flex-direction:row;align-items:center;
+    justify-content:space-between;gap:3px;width:100%;
+    white-space:nowrap;
+  }
+  #hint .hintGestures{display:inline;flex:0 1 auto;min-width:0;white-space:nowrap}
+  #hint .hintTinyGestures{display:none}
+  #hint .wiredMousePc{display:block;flex:0 0 35px;width:35px;height:17px;color:#84e7f7}
+  #hint .hintFull{display:block;flex:none;color:#b3f6ff;font-weight:700;margin-right:2px}
+  #hint .hintSep{color:#84aeba;margin:0 1px}
+  /* Keep screen labels appropriate to phone width. */
+  .loader span{font-size:clamp(10px,2.8vw,12px)}
+}
+@media(max-width:390px){
+  #hint{font-size:9px;padding:6px 4px}
+  #hint .wiredMousePc{flex-basis:29px;width:29px;height:15px}
+}
+@media(max-width:350px){
+  #hint .hintGestures{display:none}
+  #hint .hintTinyGestures{display:inline;white-space:nowrap}
+}

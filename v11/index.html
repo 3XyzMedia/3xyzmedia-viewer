@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050b12"><meta name="description" content="3XyzMedia RGB Bridge™ — интерактивный 3D-просмотрщик Gaussian Splatting">
+<title>3XyzMedia RGB Bridge™</title>
+<link rel="stylesheet" href="viewer.css?v=11" />
+</head><body>
+<div id="pano" aria-label="Просмотр 3D Gaussian Splat модели"></div>
+<canvas id="fxCanvas" aria-hidden="true"></canvas>
+<canvas id="experienceCanvas" aria-hidden="true"></canvas>
+<div id="surface" role="region" aria-label="Вращайте модель мышью или одним пальцем. Масштаб двумя пальцами или колесом."></div>
+<nav class="toolbar" id="toolbar" aria-label="Просмотр 3XyzMedia">
+  <button type="button" class="tool" id="axes" title="Показать WORLD XYZ">XYZ</button>
+  <button type="button" class="tool play" id="play" aria-label="Включить вращение">▶ PLAY</button>
+  <button type="button" class="tool" id="home" title="Домой">⌂</button>
+  <button type="button" class="tool" id="fxToggle" title="Экранные эффекты" aria-pressed="true">FX ON</button>
+  <button type="button" class="tool" id="tour" hidden>🎬 TOUR</button>
+  <button type="button" class="tool" id="video" hidden>▣ VIDEO</button>
+  <button type="button" class="tool" id="mp3" title="Музыка">▶/ MP3</button>
+</nav>
+<button class="logo" type="button" id="brand" aria-expanded="false" title="3XyzMedia — раскрыть рамку / LABEL">3XyzMedia RGB Bridge™<span class="brandSub">Каждый объект начинается с цвета…</span><span class="brandContact">Contact: ✉ xyzmedia3@yandex.ru</span></button>
+<div id="loading" role="status" aria-live="polite"><div class="loader">
+  <strong>3XyzMedia RGB Bridge™</strong><span>Loading 3D Gaussian Splatting Viewer…</span>
+  <b id="percent">0%</b><div class="bar"><div id="fill"></div></div>
+  <small id="phase">Подключение 3D-движка…</small>
+</div></div>
+<div id="message" role="alert" hidden></div>
+<div id="help" class="hidden" aria-label="Информация о Viewer">1 палец / ЛКМ — вращение<br>2 пальца — zoom + перемещение · колесо — zoom<br>ПКМ/MMB — pan · Shift+ЛКМ — roll<br>PLAY — вращение · ⌂ — домой · ▶/Ⅱ MP3 — музыка<br>🎬 TOUR — пройти сохранённый маршрут · ▣ VIDEO — плавающее MP4<br>✨ FX — запустить выбранный автором эффект · ⚛ LAB — эффекты просмотра<br>3XyzMedia RGB Bridge™ — запуск авторского LABEL по нажатию на рамку</div>
+<button id="helpToggle" type="button" title="Информация / подсказки" aria-expanded="false">i</button>
+<div class="fx-bottom" id="fxBottom">
+ <button type="button" id="burst" title="Запустить эффект из SHARE" hidden>✨ FX</button>
+ <button type="button" id="lab" title="Доступные эффекты просмотра" hidden>⚛ LAB</button>
+</div>
+<div id="fxChoices" hidden aria-label="Эффекты просмотра">
+ <strong>⚛ Gaussian FX</strong><button type="button" id="closeFxChoices" title="Закрыть">×</button>
+ <div class="choices">
+  <button type="button" data-view-fxmode="1">💥 BURST</button>
+  <button type="button" data-view-fxmode="2">🌀 VORTEX</button>
+  <button type="button" data-view-fxmode="5">🌪 SPIRAL</button>
+  <button type="button" data-view-fxmode="6">🔥 FIRE</button>
+  <button type="button" data-view-fxmode="3">✨ UNVEIL</button>
+  <button type="button" data-view-fxmode="4">🌈 RAINBOW</button>
+ </div>
+</div>
+<canvas id="axesCanvas" width="132" height="132" aria-hidden="true"></canvas>
+<div class="hint" id="hint">
+ <span class="hintDesktop">☝️ Вращение · ✌️ Масштаб и перемещение · Колесо — зум</span>
+ <span class="hintMobile" aria-label="Один палец — вращение; два пальца — масштаб и перемещение; полная версия на компьютере">
+  <span class="hintGestures">☝️ Вращение <span class="hintSep">·</span> ✌️ Масштаб/перемещение <span class="hintSep">·</span></span>
+  <span class="hintTinyGestures">☝️ Вращ. <span class="hintSep">·</span> ✌️ Масштаб/сдвиг <span class="hintSep">·</span></span>
+  <svg class="wiredMousePc" viewBox="0 0 66 28" width="52" height="24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="29" height="18" rx="2.3"/><path d="M16.5 22v3M10 25h13"/><g transform="rotate(-22 49 16)"><ellipse cx="49" cy="16" rx="7" ry="10"/><path d="M49 6v7M46 12h6"/></g><path d="M46.5 5C43 1 49-1 54 2"/></g></svg><span class="hintFull">Full</span>
+ </span>
+</div>
+<div id="videoBox" hidden><button id="closeVideo" title="Закрыть видео">✕</button><video id="player" controls playsinline preload="none"></video></div>
+<audio id="viewerAudio" preload="none"></audio>
+<script src="viewer.js?v=11" defer></script>
+<script src="viewer-experience.js?v=11" defer></script>
+<script src="viewer-starfield-v72.js?v=11" defer></script>
+<script src="viewer-20k.js?v=11" defer></script>
+<script src="viewer-v72-controls.js?v=11" defer></script>
+<script src="viewer-fire-v72.js?v=11" defer></script>
+</body></html>
