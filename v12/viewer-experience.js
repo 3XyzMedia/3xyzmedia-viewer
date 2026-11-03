@@ -29,10 +29,10 @@ window.xyzViewerFXSetEnabled=setFxEnabled;
 // The fxui=0 share flag only restricts author/guest FX tools; it MUST NOT make the visible master button inert.
 fx.classList.add('active');fx.addEventListener('click',()=>setFxEnabled(!fxOn));
 
-function safeMusic(src){if(typeof src!=='string')return '';let t=src.trim();if(!t)t='/VIEWER/music/peremen.mp3';
+function safeMusic(src){if(typeof src!=='string')return '';let t=src.trim();if(!t)t='https://3xyzmedia.github.io/3xyzmedia-viewer/assets/music/peremen.mp3';
  try{let u=new URL(t, location.origin);if(u.protocol!=='https:'&&u.origin!==location.origin)return '';if(!/\.mp3(?:$|\?)/i.test(u.pathname))return '';
  if(t.startsWith('/VIEWER/music/'))u=new URL('https://3xyzmedia.github.io'+t);return u.href;}catch(e){return ''}}
-let musicURL=safeMusic(st.mp||'/VIEWER/music/peremen.mp3'),musicDisabled=false,pending=false;
+let musicURL=safeMusic(st.mp||'https://3xyzmedia.github.io/3xyzmedia-viewer/assets/music/peremen.mp3'),musicDisabled=false,pending=false;
 // STUDIO v72 starts MP3 on the first trusted action even if the panel toggle me is OFF.
 // A deliberate author ma=0 still prevents automatic playback.
 if(allowMusic&&musicURL){mp3.hidden=false;mp3.textContent='▶/ MP3';mp3.title='Нажмите для музыки';audio.volume=clamp(number(st.mv,30)/100,0,1);

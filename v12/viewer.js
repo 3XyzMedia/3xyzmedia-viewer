@@ -144,6 +144,6 @@ if(tourPoints.length>=2&&qs.get('tourui')!=='0'){$('tour').hidden=false;$('tour'
 const videoSrc=typeof shared.vu==='string' ? (/^https:\/\//i.test(shared.vu)?shared.vu:(/^\/VIEWER\/video\/[\w.-]+\.mp4$/i.test(shared.vu)?'https://3xyzmedia.github.io'+shared.vu:'')) : '';
 if(videoSrc&&qs.get('videoui')!=='0'){$('video').hidden=false;$('video').addEventListener('click',()=>{$('videoBox').hidden=false;$('player').src=videoSrc;$('player').play().catch(()=>{})});$('closeVideo').addEventListener('click',()=>{$('videoBox').hidden=true;$('player').pause()})}
 // FX layers are controlled only by viewer-experience.js. No second snow/stars loop.
-function injectRuntime(){const script=document.createElement('script');script.src='./krpano.js';script.onload=loadKrpano;script.onerror=()=>{const fallback=document.createElement('script');fallback.src='https://3xyzmedia.github.io/VIEWER/krpano.js';fallback.onload=loadKrpano;fallback.onerror=()=>showError('krpano.js недоступен.');document.head.appendChild(fallback)};document.head.appendChild(script)}
+function injectRuntime(){const script=document.createElement('script');script.src='./krpano.js';script.onload=loadKrpano;script.onerror=()=>showError('krpano.js недоступен.');document.head.appendChild(script)}
 injectRuntime();
 })();
