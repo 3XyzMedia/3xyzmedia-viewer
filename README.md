@@ -15,7 +15,7 @@
 https://3xyzmedia.github.io/3xyzmedia-viewer/model/EMELYA%20IN%20THE%20FIRE.ply
 ```
 
-Короткое имя `SOY2.ply` в Viewer v12 по-прежнему ищется в старом хранилище `3XyzMedia/3d-models/model/`. Для файлов в этом репозитории используйте полный URL. Старые модели переносить не требуется.
+Короткое имя `SOY2.ply` в Viewer v12/v13 по-прежнему ищется в старом хранилище `3XyzMedia/3d-models/model/`. Для файлов в этом репозитории используйте полный URL. Старые модели переносить не требуется.
 
 Ссылки GitHub с `/blob/main/` не являются прямыми адресами модели. В URL пробел заменяется на `%20`; для новых имён удобнее подчёркивания.
 
@@ -23,5 +23,5 @@ https://3xyzmedia.github.io/3xyzmedia-viewer/model/EMELYA%20IN%20THE%20FIRE.ply
 
 [Подробная инструкция](assets/README_UPLOADS_RU.txt)
 
-Публичный Viewer: [v12](https://3xyzmedia.github.io/3xyzmedia-viewer/v12/).
+Публичный Viewer: [v13](https://3xyzmedia.github.io/3xyzmedia-viewer/v13/). Для передачи огня и ограничений дистанции используйте личную STUDIO v72 FIX14 и создайте новую SHARE-ссылку на `/v13/`.
 Авторскую STUDIO и исходники личных инструментов сюда не загружать. Старый репозиторий VIEWER закрыт; его адреса не использовать для новых ресурсов.
