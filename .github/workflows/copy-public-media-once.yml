@@ -1,0 +1,35 @@
+name: Copy current public music and video to Viewer assets
+on:
+  push:
+    paths:
+      - .github/workflows/copy-public-media-once.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  copy-media:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Download media from public old VIEWER and verify exact Git blobs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/music assets/video
+          curl --fail --location --retry 3 --silent --show-error             'https://raw.githubusercontent.com/3XyzMedia/VIEWER/main/music/peremen.mp3'             -o assets/music/peremen.mp3
+          curl --fail --location --retry 3 --silent --show-error             'https://raw.githubusercontent.com/3XyzMedia/VIEWER/main/video/G_1.mp4'             -o assets/video/G_1.mp4
+          test "$(git hash-object assets/music/peremen.mp3)" = 'aa796b0d7dab0b4c65b6d26d57eccfaf1a6fda40'
+          test "$(git hash-object assets/video/G_1.mp4)" = '821f8b132cfb0e7485c858716dcde050ebc0270d'
+      - name: Commit assets without touching Viewer or private STUDIO
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/music/peremen.mp3 assets/video/G_1.mp4
+          if ! git diff --cached --quiet; then
+            git commit -m "Import public MP3 and MP4 into stable Viewer assets before locking old repo"
+            git push origin HEAD:main
+          fi
