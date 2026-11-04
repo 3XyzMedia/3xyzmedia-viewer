@@ -1,5 +1,6 @@
-name: Build EMELYA LOD
+name: Build Gaussian LOD
 on:
+  workflow_dispatch:
   push:
     paths:
       - '.github/workflows/build-emelya-lod.yml'
@@ -9,6 +10,7 @@ concurrency:
   cancel-in-progress: true
 permissions:
   contents: write
+  pages: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,25 +29,50 @@ jobs:
       - name: Merge LODs for current models and write manifests
         run: |
           python3 - <<'PY'
-          import json, struct, subprocess, os
+          import json, struct, subprocess, os, math
           from pathlib import Path
-          def read(p):
-              b=Path(p).read_bytes(); end=b.index(b'end_header\n')+11
-              lines=b[:end].decode('ascii').splitlines()
-              n=int(next(x.split()[2] for x in lines if x.startswith('element vertex ')))
-              chunks=int(next(x.split()[2] for x in lines if x.startswith('element chunk ')))
-              start=next(i for i,x in enumerate(lines) if x.startswith('element chunk '))
-              props=[]
-              for line in lines[start+1:]:
-                  if line.startswith('element '): break
-                  if line.startswith('property '): props.append(line.split()[-1])
-              stride=len(props)*4
-              a=[struct.unpack_from('<'+str(len(props))+'f',b,end+i*stride) for i in range(chunks)]
-              lo=[min(x[props.index('min_'+d)] for x in a) for d in 'xyz']
-              hi=[max(x[props.index('max_'+d)] for x in a) for d in 'xyz']
-              assert len(b)>=end+chunks*stride+n*16
-              return n,lo,hi
-          cli=['npx','--yes','@playcanvas/splat-transform@3.10.3']
+          SIZE={'float':4,'float32':4,'double':8,'float64':8,'uchar':1,'uint8':1,'char':1,'int8':1,'uint':4,'uint32':4,'int':4,'int32':4,'short':2,'ushort':2,'int16':2,'uint16':2}
+          FMT={'float':'f','float32':'f','double':'d','float64':'d','uchar':'B','uint8':'B','char':'b','int8':'b','uint':'I','uint32':'I','int':'i','int32':'i','short':'h','ushort':'H','int16':'h','uint16':'H'}
+          def metadata(path):
+           with Path(path).open('rb') as f:
+            lines=[]
+            while True:
+             line=f.readline()
+             if not line or f.tell()>131072:raise ValueError('Invalid PLY header')
+             text=line.decode('ascii').strip();lines.append(text)
+             if text=='end_header':break
+            if 'format binary_little_endian 1.0' not in lines:raise ValueError('Use binary little-endian Gaussian PLY')
+            elements=[];el=None
+            for line in lines:
+             a=line.split()
+             if a[:1]==['element']:el={'name':a[1],'count':int(a[2]),'props':[]};elements.append(el)
+             elif a[:1]==['property'] and el is not None:
+              if a[1]=='list':raise ValueError('PLY list properties not supported')
+              el['props'].append((a[2],a[1]))
+            vertices=next(e['count'] for e in elements if e['name']=='vertex');lo=[math.inf]*3;hi=[-math.inf]*3;got=False
+            for el in elements:
+             offsets={};stride=0
+             for name,typ in el['props']:offsets[name]=(stride,typ);stride+=SIZE[typ]
+             if el['name']=='chunk' and all('min_'+a in offsets for a in 'xyz'):
+              data=f.read(stride*el['count'])
+              for i in range(el['count']):
+               for d,a in enumerate('xyz'):
+                o,t=offsets['min_'+a];lo[d]=min(lo[d],struct.unpack_from('<'+FMT[t],data,i*stride+o)[0]);o,t=offsets['max_'+a];hi[d]=max(hi[d],struct.unpack_from('<'+FMT[t],data,i*stride+o)[0])
+              got=True
+             elif el['name']=='vertex' and not got and all(a in offsets for a in 'xyz'):
+              for start in range(0,el['count'],10000):
+               n=min(10000,el['count']-start);data=f.read(stride*n)
+               if len(data)!=stride*n:raise ValueError('Truncated PLY')
+               for i in range(n):
+                for d,a in enumerate('xyz'):
+                 o,t=offsets[a];v=struct.unpack_from('<'+FMT[t],data,i*stride+o)[0]
+                 if math.isfinite(v):lo[d]=min(lo[d],v);hi[d]=max(hi[d],v)
+              got=True
+             else:f.seek(stride*el['count'],1)
+            if not got or not all(math.isfinite(x) for x in lo+hi):raise ValueError('No finite XYZ bounds')
+            return vertices,lo,hi
+          read=metadata
+          cli=['npx','--yes','@playcanvas/splat-transform@3.10.3','-w']
           for source in sorted(Path('model').glob('*.ply')):
               count,lo,hi=read(source)
               if count<1024: continue
@@ -69,6 +96,10 @@ jobs:
           git config user.email "lod-builder@users.noreply.github.com"
           git add model/lod model/*.lod.json
           git diff --cached --quiet && exit 0
-          git commit -m "Generate EMELYA 250K and 62.5K LOD assets"
+          git commit -m "Generate Gaussian LOD assets"
           git pull --rebase origin main
           git push origin main
+      - name: Rebuild Pages with generated levels
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"
