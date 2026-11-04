@@ -17,8 +17,10 @@ jobs:
       - name: Generate actual reduced Gaussian models
         run: |
           mkdir -p model/lod/EMELYA
-          npx --yes @playcanvas/splat-transform@3.10.3 "model/EMELYA IN THE FIRE.ply" --decimate 250000 model/lod/EMELYA/LOD1.compressed.ply
-          npx --yes @playcanvas/splat-transform@3.10.3 "model/EMELYA IN THE FIRE.ply" --decimate 62500 model/lod/EMELYA/LOD2.compressed.ply
+          npx --yes @playcanvas/splat-transform@3.10.3 "model/EMELYA IN THE FIRE.ply" --decimate 250000 "$RUNNER_TEMP/LOD1.ply"
+          npx --yes @playcanvas/splat-transform@3.10.3 "$RUNNER_TEMP/LOD1.ply" model/lod/EMELYA/LOD1.compressed.ply
+          npx --yes @playcanvas/splat-transform@3.10.3 "model/EMELYA IN THE FIRE.ply" --decimate 62500 "$RUNNER_TEMP/LOD2.ply"
+          npx --yes @playcanvas/splat-transform@3.10.3 "$RUNNER_TEMP/LOD2.ply" model/lod/EMELYA/LOD2.compressed.ply
       - name: Validate and index levels without changing coordinates
         run: |
           python3 - <<'PY'
