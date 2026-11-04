@@ -1,0 +1,26 @@
+/* Native-splat surface combustion. No billboard, no second particle cloud. */
+(()=>{'use strict';const V=window.XYZViewer,by=id=>document.getElementById(id);const incoming=V?.state||(()=>{try{return decodeState(new URLSearchParams(location.search).get('v')||'')}catch{return null}})()||{};
+const def={height:.45,density:.08,speed:1,heat:1,span:0},limits={height:[0,3],density:[0,.35],speed:[.1,4],heat:[0,6],span:[0,1000000]};let axis='Z';let config={...def},active=false,frame=0,elapsed=0,last=0,selected=false;
+const ids={height:'modelFlameHeight16',density:'modelFlameDensity16',speed:'modelFlameSpeed16',heat:'modelFlameHeat16',span:'modelFlameSpan16'};
+const engine=()=>V?.getEngine()||window.xyzMorphKrpano;
+function read(){for(const[key,id]of Object.entries(ids)){if(by(id)){const x=Number(by(id).value);if(Number.isFinite(x))config[key]=Math.max(limits[key][0],Math.min(limits[key][1],x));const out=by(id+'Value');if(out)out.textContent=key==='density'?Math.round(config[key]*100)+'%':String(config[key]);}}return config}
+function capture(){read();return {...config,axis:by("fireAxis17")?.value||axis,selected,playing:active}}
+function restore(c){if(!c)return;axis=["X","-X","Y","-Y","Z","-Z"].includes(c.axis)?c.axis:"Z";if(by("fireAxis17"))by("fireAxis17").value=axis;for(const key of Object.keys(def)){const v=Number(c[key]);if(Number.isFinite(v))config[key]=Math.max(limits[key][0],Math.min(limits[key][1],v));if(by(ids[key]))by(ids[key]).value=String(config[key]);}selected=!!c.selected;read()}
+function uniforms(){const k=engine();if(!k)return;const cfg=read();const bounds=window.xyzLODBounds16;const auto=bounds?Math.max(...bounds.max.map((v,i)=>v-bounds.min[i])):1;const mx=k.get('image.splats.mx');const scale=mx?.length===16?Math.max(.000001,Math.hypot(mx[0],mx[1],mx[2])):100*Math.max(.000001,Math.abs(Number(k.get('image.splats.scale'))||1));const values={fx_fireon:1,fx_firetime:elapsed,fx_fireheight:cfg.height,fx_firedensity:cfg.density,fx_firespeed:cfg.speed,fx_fireheat:cfg.heat,fx_firespan:(cfg.span||auto)*scale,fx_firerawspan:cfg.span||auto};if(mx?.length===16){const g=[[mx[2],mx[1],-mx[0]],[mx[6],mx[5],-mx[4]],[mx[10],mx[9],-mx[8]]];for(let i=0;i<3;i++){const n=g[i].reduce((s,x)=>s+x*x,0)||1;for(let j=0;j<3;j++)values['fx_firei'+i+j]=g[i][j]/n;}values.fx_firecx=mx[14];values.fx_firecy=mx[13];values.fx_firecz=-mx[12];}else{for(let i=0;i<3;i++)for(let j=0;j<3;j++)values['fx_firei'+i+j]=i===j?1/scale:0;values.fx_firecx=values.fx_firecy=values.fx_firecz=0;}const choice=by('fireAxis17')?.value||axis;
+ const index='XYZ'.indexOf(choice.slice(-1))*4,sign=choice.startsWith('-')?-1:1;
+ const direction=mx?.length===16?[mx[index+2],mx[index+1],-mx[index]]:[Number(index===0),Number(index===4),Number(index===8)];
+ const norm=Math.hypot(...direction)||1;
+ ['x','y','z'].forEach((name,i)=>values['fx_fired'+name]=sign*direction[i]/norm);
+ for(const[key,val]of Object.entries(values))k.set('image.splats.'+key,val)}
+function updateButton(){if(by('modelFirePlay16'))by('modelFirePlay16').textContent=active?'■ Остановить горение':'🔥 Горит сама модель';if(by('modelFireStatus16'))by('modelFireStatus16').textContent=active?'Горение включено · вращайте модель':'Горение остановлено'}
+function tick(now){if(!active)return;frame=requestAnimationFrame(tick);if(document.hidden){last=0;return}if(last)elapsed+=Math.min(.1,Math.max(0,(now-last)/1000));last=now;try{uniforms()}catch{}}
+function stop(){active=false;cancelAnimationFrame(frame);frame=0;last=0;const k=engine();if(k)k.set('image.splats.fx_fireon',0);if(k&&Number(k.get('image.splats.fx_mode'))===10){k.set('image.splats.fx_mode',0);k.set('image.splats.fx_progress',0)}updateButton()}
+function play(combined=false){if(!engine())return;if(!V&&typeof effectsMasterEnabled!=='undefined'&&!effectsMasterEnabled){if(typeof showToast==='function')showToast('Сначала включите FX ON');return;}stop();if(!combined){if(!V)window.xyzFX27?.reset();else{window.dispatchEvent(new Event('xyz-model-fire-start16'));window.xyzViewer20k?.stop()}}
+ selected=true;active=true;elapsed=0;last=0;uniforms();frame=requestAnimationFrame(tick);updateButton()}
+window.xyzNativeFire16={play,stop,capture,restore,get active(){return active},get selected(){return selected}};
+by('modelFirePlay16')?.addEventListener('click',()=>active?stop():play());for(const id of Object.values(ids))by(id)?.addEventListener('input',()=>{read();if(active)uniforms()});
+window.addEventListener('xyz-brand-label',stop);window.addEventListener('xyz-viewer-fx-off',stop);window.addEventListener('xyz-viewer-native-reset',stop);window.addEventListener('pagehide',stop);window.addEventListener('xyz-lod-changed16',()=>{if(active)uniforms()});
+restore(incoming.nf);if(window.__xyzPendingNativeFire16){restore(window.__xyzPendingNativeFire16);delete window.__xyzPendingNativeFire16}
+let booted=false;function boot(){if(booted||!engine())return;booted=true;if(incoming.ef&&incoming.nf?.playing&&incoming.fm!==0&&!(V&&incoming.ea))play(true)}
+window.addEventListener('xyz-viewer-configured',boot);window.addEventListener('xyz-studio-ready16',boot);boot();updateButton();
+})();
