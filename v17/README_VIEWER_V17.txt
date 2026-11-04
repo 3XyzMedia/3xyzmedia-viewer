@@ -1,0 +1,1 @@
+Viewer v17 / STUDIO FIX18. Explicit author-selected FX shortcut buttons in fxButtons. Empty array means no launch buttons. Explicit buttons start effects on click only. Preserves v16 fire layers and axis, legacy links, desktop-only 20K and mobile low-quality/LOD.
