@@ -20,45 +20,50 @@ jobs:
           node -e "const fs=require('fs'),z=require('zlib');fs.writeFileSync(process.env.RUNNER_TEMP+'/swiftshader.tar',z.brotliDecompressSync(fs.readFileSync(process.env.RUNNER_TEMP+'/gpu/node_modules/@sparticuz/chromium/bin/swiftshader.tar.br')))"
           tar -xf "$RUNNER_TEMP/swiftshader.tar" -C "$RUNNER_TEMP"
           echo "VK_ICD_FILENAMES=$RUNNER_TEMP/vk_swiftshader_icd.json" >> "$GITHUB_ENV"
-      - name: Generate actual reduced Gaussian models
-        run: |
-          mkdir -p model/lod/EMELYA
-          npx --yes @playcanvas/splat-transform@3.10.3 "model/EMELYA IN THE FIRE.ply" --decimate 250000 "$RUNNER_TEMP/LOD1.ply"
-          npx --yes @playcanvas/splat-transform@3.10.3 "$RUNNER_TEMP/LOD1.ply" model/lod/EMELYA/LOD1.compressed.ply
-          npx --yes @playcanvas/splat-transform@3.10.3 "model/EMELYA IN THE FIRE.ply" --decimate 62500 "$RUNNER_TEMP/LOD2.ply"
-          npx --yes @playcanvas/splat-transform@3.10.3 "$RUNNER_TEMP/LOD2.ply" model/lod/EMELYA/LOD2.compressed.ply
-      - name: Validate and index levels without changing coordinates
+      - name: Merge LODs for current models and write manifests
         run: |
           python3 - <<'PY'
-          import json, struct
+          import json, struct, subprocess, os
           from pathlib import Path
           def read(p):
               b=Path(p).read_bytes(); end=b.index(b'end_header\n')+11
-              h=b[:end].decode('ascii'); lines=h.splitlines()
+              lines=b[:end].decode('ascii').splitlines()
               n=int(next(x.split()[2] for x in lines if x.startswith('element vertex ')))
               chunks=int(next(x.split()[2] for x in lines if x.startswith('element chunk ')))
-              a=[struct.unpack_from('<18f',b,end+i*72) for i in range(chunks)]
-              lo=[min(x[d] for x in a) for d in range(3)]
-              hi=[max(x[d+3] for x in a) for d in range(3)]
-              assert len(b)>=end+chunks*72+n*16
+              start=next(i for i,x in enumerate(lines) if x.startswith('element chunk '))
+              props=[]
+              for line in lines[start+1:]:
+                  if line.startswith('element '): break
+                  if line.startswith('property '): props.append(line.split()[-1])
+              stride=len(props)*4
+              a=[struct.unpack_from('<'+str(len(props))+'f',b,end+i*stride) for i in range(chunks)]
+              lo=[min(x[props.index('min_'+d)] for x in a) for d in 'xyz']
+              hi=[max(x[props.index('max_'+d)] for x in a) for d in 'xyz']
+              assert len(b)>=end+chunks*stride+n*16
               return n,lo,hi
-          source='model/EMELYA IN THE FIRE.ply'
-          count,lo,hi=read(source)
-          levels=[dict(url='EMELYA IN THE FIRE.ply',count=count)]
-          for i,want in [(1,250000),(2,62500)]:
-              path=f'model/lod/EMELYA/LOD{i}.compressed.ply'
-              n,l,h=read(path); assert n==want,(n,want)
-              assert all(abs(l[d]-lo[d])<=max(hi[d]-lo[d],1)*.1 and abs(h[d]-hi[d])<=max(hi[d]-lo[d],1)*.1 for d in range(3)), 'Unexpected transform/bounds'
-              levels.append(dict(url=f'lod/EMELYA/LOD{i}.compressed.ply',count=n))
-          manifest=dict(version=1,source='EMELYA IN THE FIRE.ply',bounds=dict(min=lo,max=hi),levels=levels)
-          Path('model/EMELYA IN THE FIRE.lod.json').write_text(json.dumps(manifest,indent=2)+'\n')
-          print(json.dumps(manifest,indent=2))
+          cli=['npx','--yes','@playcanvas/splat-transform@3.10.3']
+          for source in sorted(Path('model').glob('*.ply')):
+              count,lo,hi=read(source)
+              if count<1024: continue
+              dest=Path('model/lod')/source.stem; dest.mkdir(parents=True,exist_ok=True)
+              levels=[dict(url=source.name,count=count)]
+              for i,want in enumerate([max(256,min(250000,count//4)),max(64,min(62500,count//16))],1):
+                  temp=Path(os.environ['RUNNER_TEMP'])/('lod'+str(i)+'.ply')
+                  output=dest/f'LOD{i}.compressed.ply'
+                  subprocess.run(cli+[str(source),'--decimate',str(want),str(temp)],check=True)
+                  subprocess.run(cli+[str(temp),str(output)],check=True)
+                  n,l,h=read(output); assert n==want,(n,want)
+                  assert all(l[d]>=lo[d]-(hi[d]-lo[d])*.15-1e-6 and h[d]<=hi[d]+(hi[d]-lo[d])*.15+1e-6 for d in range(3))
+                  levels.append(dict(url=output.relative_to(source.parent).as_posix(),count=n))
+              manifest=dict(version=1,source=source.name,bounds=dict(min=lo,max=hi),levels=levels)
+              source.with_suffix('.lod.json').write_text(json.dumps(manifest,indent=2)+'\n')
+              print(json.dumps(manifest,indent=2))
           PY
       - name: Publish generated levels
         run: |
           git config user.name "3XyzMedia LOD Builder"
           git config user.email "lod-builder@users.noreply.github.com"
-          git add model/lod/EMELYA "model/EMELYA IN THE FIRE.lod.json"
+          git add model/lod model/*.lod.json
           git diff --cached --quiet && exit 0
           git commit -m "Generate EMELYA 250K and 62.5K LOD assets"
           git pull --rebase origin main
