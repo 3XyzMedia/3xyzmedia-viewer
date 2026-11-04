@@ -3,6 +3,10 @@ on:
   push:
     paths:
       - '.github/workflows/build-emelya-lod.yml'
+      - 'model/*.ply'
+concurrency:
+  group: gaussian-lod-build
+  cancel-in-progress: true
 permissions:
   contents: write
 jobs:
