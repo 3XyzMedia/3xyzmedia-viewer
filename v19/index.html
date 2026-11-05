@@ -4,7 +4,16 @@
 <meta name="theme-color" content="#050b12"><meta name="description" content="3XyzMedia RGB Bridge™ — интерактивный 3D-просмотрщик Gaussian Splatting">
 <title>3XyzMedia RGB Bridge™</title>
 <link rel="stylesheet" href="viewer.css?v=15" />
-<style>#videoFloat,#videoBox{z-index:1000002!important}#videoDrag,#videoDrag22{display:flex;align-items:center;gap:8px;min-height:42px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;color:#affff2;font:12px Arial}#videoDrag span,#videoDrag22 span{flex:1}#videoDrag button,#videoDrag22 button{flex:none;min-width:30px;min-height:30px}#videoDrag.dragging-video,#videoDrag22.dragging-video{cursor:grabbing}#videoFloat.video-expanded52 #videoDrag{cursor:default}</style></head><body>
+<style>#videoFloat,#videoBox{z-index:1000002!important}#videoDrag,#videoDrag22{display:flex;align-items:center;gap:8px;min-height:42px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;color:#affff2;font:12px Arial}#videoDrag span,#videoDrag22 span{flex:1}#videoDrag button,#videoDrag22 button{flex:none;min-width:30px;min-height:30px}#videoDrag.dragging-video,#videoDrag22.dragging-video{cursor:grabbing}#videoFloat.video-expanded52 #videoDrag{cursor:default}</style><style>
+#videoMobileControls{gap:4px;align-items:center;padding:3px 0 0}
+#videoMobileControls button{flex:none;min-width:36px;min-height:36px;padding:4px;border:1px solid #456;border-radius:6px;background:#123;color:white}
+#videoMobileSeek{min-width:0;flex:1;width:50px;margin:0;touch-action:pan-x}
+#videoFloat.video-compact23,#videoBox.video-compact23{width:min(220px,58vw)!important;max-width:calc(100vw - 16px)!important;max-height:calc(100dvh - 16px)!important;height:auto!important;padding:4px!important;border-radius:9px!important;overflow:hidden}
+#videoFloat.video-compact23 video,#videoBox.video-compact23 video{display:block;width:100%!important;height:auto!important;aspect-ratio:16/9;max-height:min(140px,30dvh)!important;object-fit:contain!important;background:#000}
+.video-compact23 #videoDrag,.video-compact23 #videoDrag22{font-size:10px!important;min-height:32px!important;padding:0 2px!important;gap:3px!important}
+.video-compact23 #videoDrag button,.video-compact23 #videoDrag22 button{min-height:30px!important;min-width:30px!important;padding:2px!important}
+.video-compact23 #videoExpand52{display:none!important}
+</style></head><body>
 <nav id="fxShortcuts" class="fx-shortcuts" aria-label="Эффекты сцены" hidden></nav><div id="pano" aria-label="Просмотр 3D Gaussian Splat модели"></div>
 <canvas id="fxCanvas" aria-hidden="true"></canvas>
 <canvas id="experienceCanvas" aria-hidden="true"></canvas>
@@ -70,4 +79,4 @@
 <script src="viewer-v72-controls.js?v=15" defer></script>
 <script src="viewer-fire-v72.js?v=15" defer></script>
 <script src="xyz-native-fire16.js?v=15" defer></script>
-<script src="xyz-video-window22.js?v=22" defer></script></body></html>
+<script src="xyz-video-window23.js?v=23" defer></script></body></html>
