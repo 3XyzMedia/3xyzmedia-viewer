@@ -1,0 +1,1 @@
+Viewer v19 / STUDIO FIX20. Optional screenFire anchor to projected PLY bbox center, size and local XYZ offset. Source appearance and non-anchor branch retained. Persists FIX19 profiles/20K anchor/LOD policy.
