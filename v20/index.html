@@ -4,7 +4,7 @@
 <meta name="theme-color" content="#050b12"><meta name="description" content="3XyzMedia RGB Bridge™ — интерактивный 3D-просмотрщик Gaussian Splatting">
 <title>3XyzMedia RGB Bridge™</title>
 <link rel="stylesheet" href="viewer.css?v=15" />
-</head><body>
+<style>#videoFloat,#videoBox{z-index:1000002!important}#videoDrag,#videoDrag22{display:flex;align-items:center;gap:8px;min-height:42px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;color:#affff2;font:12px Arial}#videoDrag span,#videoDrag22 span{flex:1}#videoDrag button,#videoDrag22 button{flex:none;min-width:30px;min-height:30px}#videoDrag.dragging-video,#videoDrag22.dragging-video{cursor:grabbing}#videoFloat.video-expanded52 #videoDrag{cursor:default}</style></head><body>
 <nav id="fxShortcuts" class="fx-shortcuts" aria-label="Эффекты сцены" hidden></nav><div id="pano" aria-label="Просмотр 3D Gaussian Splat модели"></div>
 <canvas id="fxCanvas" aria-hidden="true"></canvas>
 <canvas id="experienceCanvas" aria-hidden="true"></canvas>
@@ -58,7 +58,7 @@
   <span class="hintFullGroup"><svg class="wiredMousePc" viewBox="0 0 66 28" width="52" height="24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="29" height="18" rx="2.3"/><path d="M16.5 22v3M10 25h13"/><g transform="rotate(-22 49 16)"><ellipse cx="49" cy="16" rx="7" ry="10"/><path d="M49 6v7M46 12h6"/></g><path d="M46.5 5C43 1 49-1 54 2"/></g></svg><span class="hintFull">Full</span></span>
  </span>
 </div>
-<div id="videoBox" hidden><button id="closeVideo" title="Закрыть видео">✕</button><video id="player" controls playsinline preload="none"></video></div>
+<div id="videoBox" hidden><div id="videoDrag22" title="Потяни за эту полоску"><span>⠿ Перетащить VIDEO</span><button id="closeVideo" title="Закрыть видео">✕</button></div><video id="player" controls playsinline preload="none"></video></div>
 <audio id="viewerAudio" preload="none"></audio>
 <script src="xyz-fire-anchor20.js" defer></script>
 <script src="xyz-lod-core16.js?v=15" defer></script>
@@ -71,4 +71,4 @@
 <script src="viewer-v72-controls.js?v=15" defer></script>
 <script src="viewer-fire-v72.js?v=15" defer></script>
 <script src="xyz-native-fire16.js?v=15" defer></script>
-</body></html>
+<script src="xyz-video-window22.js?v=22" defer></script></body></html>
