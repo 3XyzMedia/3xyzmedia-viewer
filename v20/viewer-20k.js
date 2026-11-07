@@ -1,9 +1,8 @@
 /* 3XyzMedia VIEWER 20K: viewer-only playback based on the 20K renderer, no editor UI. */
 (()=>{'use strict';
 const V=window.XYZViewer, params=new URLSearchParams(location.search);if(!V||params.get('gpu20k')!=='1')return;
-const mobile=(navigator.maxTouchPoints>0&&innerWidth<900)||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+if(!V.canRun20K?.())return;
 const pano=document.getElementById('pano');
-if(mobile){return;} // v72: desktop-only GPU 20K
 const BASE_N=20000, N=20000;
 let gl=null,prog=null,vao=null,uniforms={},buffers=[],source=null,target=null,seed=null,sourceColor=null,labelColor=null,ready=false,loading=null,active=false,frame=0,startCam=null,originalOpacity=1;
 const canvas=document.createElement('canvas');canvas.id='viewer20k';Object.assign(canvas.style,{position:'fixed',inset:'0',width:'100%',height:'100%',zIndex:'9',pointerEvents:'none',display:'none'});document.body.appendChild(canvas);
@@ -101,8 +100,8 @@ function draw(p){if(!ready)return;let w=Math.floor(innerWidth*Math.min(devicePix
   gl.drawArrays(gl.POINTS,0,N);
 }
 function restore(){active=false;cancelAnimationFrame(frame);frame=0;canvas.style.display='none';pano.style.opacity=String(originalOpacity);try{let k=V.getEngine();k&&k.set('image.splats.fx_progress',0);k&&k.set('image.splats.fx_mode',0)}catch(e){}}
-async function start(){if(active){restore();return}try{await prepare();originalOpacity=Number(pano.style.opacity||1);const anchor=V.state?.g20?.anchor;startCam=anchor&&Number.isFinite(anchor.yaw)&&Number.isFinite(anchor.pitch)?[anchor.yaw,anchor.pitch,V.getCamera().d]:[...V.getCamera().o.slice(0,2),V.getCamera().d];active=true;canvas.style.display='block';let t0=performance.now(),total=Math.max(1000,cfg('Duration',8)*1000),hold=Math.max(0,cfg('Hold',0)*1000),half=total/2;
-function render(t){if(!active)return;const e=t-t0;let p=e<half?.5*(e/half):e<half+hold?.5:.5+.5*Math.min(1,(e-half-hold)/half);draw(p);if(e<total+hold)frame=requestAnimationFrame(render);else restore()};frame=requestAnimationFrame(render)}catch(e){restore();const el=document.getElementById('message');if(el){el.hidden=false;el.textContent='MORPH 20K: '+e.message}}finally{}}
+async function start(){if(!V.canRun20K())return;if(active){restore();return}try{await prepare();if(!V.canRun20K()||window.__xyzViewFXOn===false)return;originalOpacity=Number(pano.style.opacity||1);const anchor=V.state?.g20?.anchor;startCam=anchor&&Number.isFinite(anchor.yaw)&&Number.isFinite(anchor.pitch)?[anchor.yaw,anchor.pitch,V.getCamera().d]:[...V.getCamera().o.slice(0,2),V.getCamera().d];active=true;canvas.style.display='block';let t0=performance.now(),total=Math.max(1000,cfg('Duration',8)*1000),hold=Math.max(0,cfg('Hold',0)*1000),half=total/2;
+function render(t){if(!active)return;if(!V.canRun20K()){restore();return;}const e=t-t0;let p=e<half?.5*(e/half):e<half+hold?.5:.5+.5*Math.min(1,(e-half-hold)/half);draw(p);if(e<total+hold)frame=requestAnimationFrame(render);else restore()};frame=requestAnimationFrame(render)}catch(e){restore();const el=document.getElementById('message');if(el){el.hidden=false;el.textContent='MORPH 20K: '+e.message}}finally{}}
 window.addEventListener('wheel',e=>{if(!active)return;if(e.target.closest('#fxChoices,#videoBox'))return;textZoom=Math.max(3,Math.min(50,textZoom*Math.exp(Math.sign(e.deltaY)*.085)));e.preventDefault();},{capture:true,passive:false});
 window.xyzViewer20k={start,stop:restore};
 window.addEventListener('xyz-brand-label',event=>{if(window.__xyzViewFXOn!==false&&event.detail?.mode==='gpu20k')start()});

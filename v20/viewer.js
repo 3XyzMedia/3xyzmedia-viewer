@@ -41,6 +41,15 @@ function zoomDistance(d){return zoomPolicy.locked?initial.d:boundDistance(d)}
 let camera=JSON.parse(JSON.stringify(initial)),engine=null,playFrame=0,playLast=0,playing=false,tourFrame=0,tourPlaying=false,gest=null;
 window.XYZViewer={state:shared,params:qs,model,getEngine:()=>engine,getCamera:()=>camera,getCameraMath:()=>camMath(),getInitial:()=>initial,render:()=>render(),restoreHome:()=>home(),zoomPolicy,zoomDistance,playState:()=>playing,tourState:()=>tourPlaying};
 const isMobile=matchMedia('(pointer:coarse)').matches||matchMedia('(max-width:700px)').matches;
+// Only enable GPU 20K on a clearly non-touch desktop, including when a phone requests desktop mode.
+function canRun20K(){
+ return navigator.maxTouchPoints === 0 &&
+   !/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) &&
+   !matchMedia('(any-pointer: coarse)').matches &&
+   matchMedia('(min-width: 900px) and (pointer: fine) and (hover: hover)').matches;
+}
+window.XYZViewer.canRun20K=canRun20K;
+
 const quality=['auto','low','high'].includes(shared.qm)?shared.qm:'auto';
 const lowQuality=quality==='low'||(quality==='auto'&&isMobile);
 window.XYZViewer.lowQuality=lowQuality;
@@ -146,10 +155,10 @@ const brand=$('brand');if(brand){brand.addEventListener('click',()=>{
  // The public phone viewer has no separate bottom FX button. Its command lives on the brand.
  // Preserve v72 LABEL precedence when the selected MORPH is actually available.
  const phoneLayout=window.matchMedia('(max-width:600px)').matches;
- const playableLabel=selected==='morph'||(selected==='gpu20k'&&!phoneLayout);
+ const playableLabel=selected==='morph'||(selected==='gpu20k'&&canRun20K());
  if(playableLabel){
    window.dispatchEvent(new CustomEvent('xyz-brand-label',{detail:{mode:selected}}));
- }else if(!Array.isArray(shared.fxButtons)&&phoneLayout&&(qs.get('fxui')==='1'||!!shared.ef)){
+ }else if(selected!=='gpu20k'&&!Array.isArray(shared.fxButtons)&&phoneLayout&&(qs.get('fxui')==='1'||!!shared.ef)){
    window.xyzViewPlayFX?.();
  }
 });}
