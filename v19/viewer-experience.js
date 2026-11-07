@@ -154,5 +154,7 @@ function uiTone(e){if(!st.ue||!e.isTrusted||performance.now()-lastTone<95)return
  const zoom=e.type==='wheel';osc.type='sine';osc.frequency.setValueAtTime(zoom?420:660,t);osc.frequency.exponentialRampToValueAtTime(zoom?340:820,t+.055);gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(Math.max(.0002,vol*.22),t+.008);gain.gain.exponentialRampToValueAtTime(.0001,t+.055);osc.connect(gain);gain.connect(ac.destination);osc.start(t);osc.stop(t+.065)};
  if(uiAudio.state==='running')sound();else uiAudio.resume().then(sound).catch(()=>{});
 }
-window.addEventListener('pointerdown',uiTone,{passive:true});window.addEventListener('wheel',uiTone,{passive:true});
+window.addEventListener('pointerdown',uiTone,{passive:true});window.addEventListener('wheel',event=>{
+ if($('surface').contains(event.target))uiTone(event);
+},{capture:true,passive:true});
 })();

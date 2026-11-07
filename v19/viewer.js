@@ -50,6 +50,15 @@ function canRun20K(){
 }
 window.XYZViewer.canRun20K=canRun20K;
 
+// Ordinary desktop MORPH does not need the GPU 20K viewport and input restrictions.
+function canRunDesktopMorph(){
+ const ua=navigator.userAgent;
+ if(navigator.userAgentData?.mobile||/Android|iPhone|iPad|iPod|Mobile/i.test(ua))return false;
+ if(navigator.maxTouchPoints===0)return true;
+ return /Windows NT/i.test(ua)&&matchMedia('(any-pointer: fine) and (any-hover: hover)').matches;
+}
+
+
 const quality=['auto','low','high'].includes(shared.qm)?shared.qm:'auto';
 const lowQuality=quality==='low'||(quality==='auto'&&isMobile);
 window.XYZViewer.lowQuality=lowQuality;
@@ -151,7 +160,7 @@ $('play').addEventListener('click',togglePlay);$('home').addEventListener('click
 const brand=$('brand');if(brand){brand.addEventListener('click',()=>{
  const opened=!brand.classList.contains('expanded');brand.classList.toggle('expanded',opened);
  brand.setAttribute('aria-expanded',String(opened));
- if(qs.get('labeldesktop')==='1'&&!canRun20K())return;
+ if(qs.get('labeldesktop')==='1'&&!canRunDesktopMorph())return;
  const selected=qs.get('labelfx')||(qs.get('gpu20k')==='1'?'gpu20k':qs.get('morph')==='1'?'morph':'none');
  // The public phone viewer has no separate bottom FX button. Its command lives on the brand.
  // Preserve v72 LABEL precedence when the selected MORPH is actually available.
