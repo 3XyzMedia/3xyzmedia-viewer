@@ -151,6 +151,7 @@ $('play').addEventListener('click',togglePlay);$('home').addEventListener('click
 const brand=$('brand');if(brand){brand.addEventListener('click',()=>{
  const opened=!brand.classList.contains('expanded');brand.classList.toggle('expanded',opened);
  brand.setAttribute('aria-expanded',String(opened));
+ if(qs.get('labeldesktop')==='1'&&!canRun20K())return;
  const selected=qs.get('labelfx')||(qs.get('gpu20k')==='1'?'gpu20k':qs.get('morph')==='1'?'morph':'none');
  // The public phone viewer has no separate bottom FX button. Its command lives on the brand.
  // Preserve v72 LABEL precedence when the selected MORPH is actually available.
