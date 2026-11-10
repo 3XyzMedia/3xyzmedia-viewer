@@ -1,0 +1,27 @@
+name: Import public Viewer snapshot
+on:
+  push:
+    paths:
+      - '.github/workflows/import-viewer.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import:
+    if: github.repository == '3XyzMedia/3xyzmedia-viewer-staging' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Copy pinned public snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir "$RUNNER_TEMP/viewer-snapshot"
+          curl --fail --silent --show-error --location 'https://codeload.github.com/3XyzMedia/3xyzmedia-viewer/tar.gz/979c58b82ed4b27736adae3c6b36cb94a0843497' | tar -xz --strip-components=1 -C "$RUNNER_TEMP/viewer-snapshot"
+          test -f "$RUNNER_TEMP/viewer-snapshot/v19/index.html"
+          test -f "$RUNNER_TEMP/viewer-snapshot/v20/index.html"
+          rsync -a --exclude='/.github/' "$RUNNER_TEMP/viewer-snapshot/" ./
+          git add --all
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Import clean Viewer snapshot'
+          git push origin HEAD:main
