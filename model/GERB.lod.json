@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "source": "GERB.ply",
+  "bounds": {
+    "min": [
+      -0.5170117616653442,
+      -0.24829207360744476,
+      -0.5454204082489014
+    ],
+    "max": [
+      0.5199301242828369,
+      0.22671447694301605,
+      0.6047335267066956
+    ]
+  },
+  "levels": [
+    {
+      "url": "GERB.ply",
+      "count": 400166
+    },
+    {
+      "url": "lod/GERB/LOD1.compressed.ply",
+      "count": 100041
+    },
+    {
+      "url": "lod/GERB/LOD2.compressed.ply",
+      "count": 25010
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050b12"><meta name="description" content="3XyzMedia RGB Bridge™ — интерактивный 3D-просмотрщик Gaussian Splatting">
+<title>3XyzMedia RGB Bridge™</title>
+<link rel="stylesheet" href="viewer.css" />
+</head><body>
+<div id="pano" aria-label="Просмотр 3D Gaussian Splat модели"></div>
+<canvas id="fxCanvas" aria-hidden="true"></canvas>
+<canvas id="experienceCanvas" aria-hidden="true"></canvas>
+<div id="surface" role="region" aria-label="Вращайте модель мышью или одним пальцем. Масштаб двумя пальцами или колесом."></div>
+<nav class="toolbar" aria-label="Просмотр">
+  <button type="button" id="play" aria-label="Включить вращение">▶ PLAY</button>
+  <button type="button" id="home" title="Восстановить исходный ракурс">⌂ HOME</button>
+  <button type="button" id="tour" hidden>🎬 TOUR</button>
+  <button type="button" id="video" hidden>▣ VIDEO</button>
+  <button type="button" id="mp3" title="Музыка" hidden>♫ MP3</button>
+  <button type="button" id="fx" title="Визуальные эффекты" hidden>✨ FX</button>
+  <button type="button" id="burst" title="Запустить эффект из SHARE" hidden>🔥 BURST</button>
+</nav>
+<button class="logo" type="button" id="brand" aria-expanded="false" title="3XyzMedia — открыть рамку и запустить выбранный LABEL">3XyzMedia RGB Bridge™<span class="brandSub">Каждый объект начинается с цвета…</span><span class="brandContact">3XyzMedia · RGB Bridge™</span></button>
+<div id="loading" role="status" aria-live="polite"><div class="loader">
+  <strong>3XyzMedia RGB Bridge™</strong><span>Интерактивный 3D-просмотрщик</span>
+  <b id="percent">0%</b><div class="bar"><div id="fill"></div></div>
+  <small id="phase">Подключение 3D-движка…</small>
+</div></div>
+<div id="message" role="alert" hidden></div>
+<div class="hint" id="hint">☝️ Вращение · ✌️ Масштаб и перемещение · Колесо — зум</div>
+<div id="videoBox" hidden><button id="closeVideo" title="Закрыть видео">✕</button><video id="player" controls playsinline preload="none"></video></div>
+<audio id="viewerAudio" preload="none"></audio>
+<script src="viewer.js" defer></script>
+<script src="viewer-experience.js" defer></script>
+<script src="viewer-20k.js" defer></script>
+</body></html>

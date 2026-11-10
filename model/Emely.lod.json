@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "source": "Emely.ply",
+  "bounds": {
+    "min": [
+      -0.39422476291656494,
+      -0.4140695333480835,
+      4.34839676017873e-05
+    ],
+    "max": [
+      0.3975263237953186,
+      0.5038297176361084,
+      0.21425101161003113
+    ]
+  },
+  "levels": [
+    {
+      "url": "Emely.ply",
+      "count": 200034
+    },
+    {
+      "url": "lod/Emely/LOD1.compressed.ply",
+      "count": 50008
+    },
+    {
+      "url": "lod/Emely/LOD2.compressed.ply",
+      "count": 12502
+    }
+  ]
+}
